@@ -1,3 +1,6 @@
 petsc/*
 p4pdes/*
 */results/*
+*.o
+!*.c
+!makefile
