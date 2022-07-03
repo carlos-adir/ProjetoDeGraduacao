@@ -33,8 +33,13 @@ int main(int argc,char **argv)
   DM             da;
   Vec            x,b,r;
   Mat            A;
+  PetscLogDouble t1, t2;
+  PetscInt mx, my, mz;
+  PetscMPIInt rank;
 
   PetscCall(PetscInitialize(&argc,&argv,(char*)0,help));
+  PetscCall(PetscTime(&t1));
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   PetscCall(KSPCreate(PETSC_COMM_WORLD,&ksp));
   PetscCall(DMDACreate3d(PETSC_COMM_WORLD,DM_BOUNDARY_NONE,DM_BOUNDARY_NONE,DM_BOUNDARY_NONE,DMDA_STENCIL_STAR,7,7,7,PETSC_DECIDE,PETSC_DECIDE,PETSC_DECIDE,1,1,0,0,0,&da));
@@ -44,6 +49,7 @@ int main(int argc,char **argv)
   PetscCall(KSPSetComputeInitialGuess(ksp,ComputeInitialGuess,NULL));
   PetscCall(KSPSetComputeRHS(ksp,ComputeRHS,NULL));
   PetscCall(KSPSetComputeOperators(ksp,ComputeMatrix,NULL));
+  PetscCall(DMDAGetInfo(da,0,&mx,&my,&mz,0,0,0,0,0,0,0,0,0));
   PetscCall(DMDestroy(&da));
 
   PetscCall(KSPSetFromOptions(ksp));
@@ -56,10 +62,12 @@ int main(int argc,char **argv)
   PetscCall(MatMult(A,x,r));
   PetscCall(VecAXPY(r,-1.0,b));
   PetscCall(VecNorm(r,NORM_2,&norm));
-  PetscCall(PetscPrintf(PETSC_COMM_WORLD,"Residual norm %g\n",(double)norm));
+  PetscCall(PetscPrintf(PETSC_COMM_WORLD, "on %d x %d x %d grid:  error |u-uexact|_inf = %g\n", mx, my, mz, norm));
 
   PetscCall(VecDestroy(&r));
   PetscCall(KSPDestroy(&ksp));
+  PetscCall(PetscTime(&t2));
+  PetscCall(PetscPrintf(PETSC_COMM_SELF, "Processor %d took %f CPU seconds\n", (int)rank, (t2-t1)));
   PetscCall(PetscFinalize());
   return 0;
 }
@@ -74,8 +82,12 @@ PetscErrorCode ComputeRHS(KSP ksp,Vec b,void *ctx)
   PetscFunctionBeginUser;
   PetscCall(KSPGetDM(ksp,&dm));
   PetscCall(DMDAGetInfo(dm,0,&mx,&my,&mz,0,0,0,0,0,0,0,0,0));
-  Hx      = 1.0 / (PetscReal)(mx-1); Hy = 1.0 / (PetscReal)(my-1); Hz = 1.0 / (PetscReal)(mz-1);
-  HxHydHz = Hx*Hy/Hz; HxHzdHy = Hx*Hz/Hy; HyHzdHx = Hy*Hz/Hx;
+  Hx = 1.0 / (PetscReal)(mx-1);
+  Hy = 1.0 / (PetscReal)(my-1);
+  Hz = 1.0 / (PetscReal)(mz-1);
+  HxHydHz = Hx*Hy/Hz;
+  HxHzdHy = Hx*Hz/Hy;
+  HyHzdHx = Hy*Hz/Hx;
   PetscCall(DMDAGetCorners(dm,&xs,&ys,&zs,&xm,&ym,&zm));
   PetscCall(DMDAVecGetArray(dm,b,&barray));
 
