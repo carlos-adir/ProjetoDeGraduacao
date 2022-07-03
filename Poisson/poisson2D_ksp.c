@@ -15,9 +15,13 @@ int main(int argc,char **args) {
     KSP           ksp;
     PetscReal     errnorm;
     DMDALocalInfo info;
+    PetscLogDouble t1, t2;
+    PetscMPIInt rank;
 
-    ierr = PetscInitialize(&argc,&args,NULL,help); if (ierr) return ierr;
-
+    
+    ierr = PetscInitialize(&argc, &args, NULL, help); if (ierr) return ierr;
+    PetscCall(PetscTime(&t1));
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     // change default 9x9 size using -da_grid_x M -da_grid_y N
     ierr = DMDACreate2d(PETSC_COMM_WORLD,  // MPI_Comm comm
                         DM_BOUNDARY_NONE,  // DMBoundaryType bx, type of ghost nodes at boundary
@@ -35,30 +39,20 @@ int main(int argc,char **args) {
     CHKERRQ(ierr);
 
     // create linear system matrix A
-    ierr = DMSetFromOptions(da);
-    CHKERRQ(ierr);
-    ierr = DMSetUp(da);
-    CHKERRQ(ierr);
-    ierr = DMCreateMatrix(da,&A);
-    CHKERRQ(ierr);
-    ierr = MatSetFromOptions(A);
-    CHKERRQ(ierr);
+    ierr = DMSetFromOptions(da); CHKERRQ(ierr);
+    ierr = DMSetUp(da); CHKERRQ(ierr);
+    ierr = DMCreateMatrix(da,&A); CHKERRQ(ierr);
+    ierr = MatSetFromOptions(A); CHKERRQ(ierr);
 
     // create RHS b, approx solution u, exact solution uexact
-    ierr = DMCreateGlobalVector(da,&b);
-    CHKERRQ(ierr);
-    ierr = VecDuplicate(b,&u);
-    CHKERRQ(ierr);
-    ierr = VecDuplicate(b,&uexact);
-    CHKERRQ(ierr);
+    ierr = DMCreateGlobalVector(da,&b); CHKERRQ(ierr);
+    ierr = VecDuplicate(b,&u); CHKERRQ(ierr);
+    ierr = VecDuplicate(b,&uexact); CHKERRQ(ierr);
 
     // fill vectors and assemble linear system
-    ierr = formExact(da,uexact);
-    CHKERRQ(ierr);
-    ierr = formRHS(da,b);
-    CHKERRQ(ierr);
-    ierr = formMatrix(da,A);
-    CHKERRQ(ierr);
+    ierr = formExact(da,uexact); CHKERRQ(ierr);
+    ierr = formRHS(da,b); CHKERRQ(ierr);
+    ierr = formMatrix(da,A); CHKERRQ(ierr);
 
     // create and solve the linear system
     ierr = KSPCreate(PETSC_COMM_WORLD,&ksp); CHKERRQ(ierr);
@@ -70,12 +64,17 @@ int main(int argc,char **args) {
     ierr = VecAXPY(u,-1.0,uexact); CHKERRQ(ierr);    // u <- u + (-1.0) uxact
     ierr = VecNorm(u,NORM_INFINITY,&errnorm); CHKERRQ(ierr);
     ierr = DMDAGetLocalInfo(da,&info);CHKERRQ(ierr);
-    ierr = PetscPrintf(PETSC_COMM_WORLD,
-                "on %d x %d grid:  error |u-uexact|_inf = %g\n",
-                info.mx,info.my,errnorm); CHKERRQ(ierr);
+    ierr = PetscPrintf(PETSC_COMM_WORLD, "on %d x %d grid:  error |u-uexact|_inf = %g\n", info.mx,info.my,errnorm); CHKERRQ(ierr);
 
-    VecDestroy(&u);  VecDestroy(&uexact);  VecDestroy(&b);
-    MatDestroy(&A);  KSPDestroy(&ksp);  DMDestroy(&da);
+    VecDestroy(&u);
+    VecDestroy(&uexact);
+    VecDestroy(&b);
+    MatDestroy(&A);
+    KSPDestroy(&ksp);
+    DMDestroy(&da);
+    PetscCall(PetscTime(&t2));
+     ierr = PetscPrintf(PETSC_COMM_SELF, "Processor %d took %f CPU seconds\n", (int)rank, (t2-t1)); CHKERRQ(ierr);
+
     return PetscFinalize();
 }
 //ENDMAIN
