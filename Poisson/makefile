@@ -1,13 +1,13 @@
 #!/bin/bash
 .SILENT:
 .DEFAULT_GOAL := all
-PETSC_DIR=/home/carlosadir/Git/petsc/
-PETSC_ARCH=arch-linux-c-debug
+# PETSC_DIR=/home/carlosadir/Git/petsc/
+# PETSC_ARCH=arch-linux-c-debug
 # PETSC_ARCH=arch-linux-c-opt
 include ${PETSC_DIR}/lib/petsc/conf/variables
 include ${PETSC_DIR}/lib/petsc/conf/rules
 CFLAGS += -pedantic -std=c99
-pmax := 2
+pmax := 8
 folder := "results"
 
 all: run distclean
@@ -30,7 +30,7 @@ run2Dksp: compilepoisson2D_ksp
 	code="poisson2D_ksp";\
 	echo "For code $${code}";\
 	for p in {1..${pmax}}; do \
-		for nx in 200; do \
+		for nx in 100 128 200 256 300 350 400 500 512 550 600 700 750 850 950 1000 1100 1250 1300 1400 1500 2000; do \
 			ny=$$nx; \
 			echo "    With $${p} processors and mesh $${nx} x $${ny}"; \
 			filename="${folder}/$${code}-p$${p}-mesh$${nx}x$${ny}.txt"; \
@@ -54,13 +54,13 @@ run3Dksp: compilepoisson3D_ksp
 	code="poisson3D_ksp";\
 	echo "For code $${code}";\
 	for p in {1..${pmax}}; do \
-		for nx in 10; do \
+		for nx in 10 20 40 50 64 65 75 100 128 129 150 180 200 230 250 300 320 350 400; do \
 			ny=$$nx; \
 			nz=$$nx; \
 			echo "    With $${p} processors and mesh $${nx} x $${ny} x $${nz}"; \
 			filename="${folder}/$${code}-p$${p}-mesh$${nx}x$${ny}x$${nz}.txt"; \
 			if [ -e $${filename} ]; then rm $${filename} ; fi ; \
-			executeone="./$${code} -da_grid_x $${nx} -da_grid_y $${ny} -da_grid_z $${nz} -log_view -start_in_debugger"; \
+			executeone="./$${code} -da_grid_x $${nx} -da_grid_y $${ny} -da_grid_z $${nz} -log_view"; \
 			command="mpiexec --tag-output -np $${p} time -p $${executeone}"; \
 			{ \
 				$${command} | cat >> $${filename}; \
@@ -72,7 +72,10 @@ run3Dksp: compilepoisson3D_ksp
 createfolder:
 	if [ ! -d ${folder} ]; then mkdir -p ${folder}; fi
 
-run: createfolder run3Dksp
+pythonrenamefolder:
+	python renamefolder.py
+
+run: createfolder run2Dksp run3Dksp pythonrenamefolder
 
 distclean:
 	@rm -f *~ poisson *tmp

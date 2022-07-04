@@ -1,0 +1,29 @@
+[1,0]<stderr>:Command terminated by signal 9
+[1,0]<stderr>:real 32.95
+[1,0]<stderr>:user 12.73
+[1,0]<stderr>:sys 1.42
+--------------------------------------------------------------------------
+Primary job  terminated normally, but 1 process returned
+a non-zero exit code. Per user-direction, the job has been aborted.
+--------------------------------------------------------------------------
+[1,1]<stderr>:[0]PETSC ERROR: ------------------------------------------------------------------------
+[1,1]<stderr>:[0]PETSC ERROR: Caught signal number 15 Terminate: Some process (or the batch system) has told this process to end
+[1,1]<stderr>:[0]PETSC ERROR: Try option -start_in_debugger or -on_error_attach_debugger
+[1,1]<stderr>:[0]PETSC ERROR: or see https://petsc.org/release/faq/#valgrind
+[1,1]<stderr>:[0]PETSC ERROR: or try http://valgrind.org on GNU/linux and Apple MacOS to find memory corruption errors
+[1,1]<stderr>:[0]PETSC ERROR: configure using --with-debugging=yes, recompile, link, and run 
+[1,1]<stderr>:[0]PETSC ERROR: to get more information on the crash.
+[1,1]<stderr>:[0]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
+[1,1]<stderr>:[0]PETSC ERROR: Signal received
+[1,1]<stderr>:[0]PETSC ERROR: See https://petsc.org/release/faq/ for trouble shooting.
+[1,1]<stderr>:[0]PETSC ERROR: Petsc Release Version 3.17.3, unknown 
+[1,1]<stderr>:[0]PETSC ERROR: ./poisson3D_ksp on a arch-linux-c-opt named carlosadir by carlosadir Sun Jul  3 22:40:30 2022
+[1,1]<stderr>:[0]PETSC ERROR: Configure options --download-mpich --with-debugging=0
+[1,1]<stderr>:[0]PETSC ERROR: #1 User provided function() at unknown file:0
+--------------------------------------------------------------------------
+mpiexec detected that one or more processes exited with non-zero status, thus causing
+the job to be terminated. The first process to do so was:
+
+  Process name: [[6116,1],0]
+  Exit code:    137
+--------------------------------------------------------------------------

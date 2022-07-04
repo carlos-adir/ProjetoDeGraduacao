@@ -1,0 +1,15 @@
+[1,0]<stderr>:Command terminated by signal 9
+[1,0]<stderr>:real 30.98
+[1,0]<stderr>:user 24.85
+[1,0]<stderr>:sys 2.38
+--------------------------------------------------------------------------
+Primary job  terminated normally, but 1 process returned
+a non-zero exit code. Per user-direction, the job has been aborted.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+mpiexec detected that one or more processes exited with non-zero status, thus causing
+the job to be terminated. The first process to do so was:
+
+  Process name: [[5902,1],0]
+  Exit code:    137
+--------------------------------------------------------------------------
