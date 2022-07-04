@@ -8,5 +8,5 @@ day = data.day
 hour = data.hour
 minu = data.minute
 
-os.system("mv results/ results_%d.%d.%d-%d:%d" % (year, mes, day, hour, minu))
+os.system("mv results/ results_%d-%02d-%02d-%02d-%02d" % (year, mes, day, hour, minu))
 
