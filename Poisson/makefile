@@ -1,13 +1,14 @@
 #!/bin/bash
 .SILENT:
 .DEFAULT_GOAL := all
-# PETSC_DIR=/home/carlosadir/Git/petsc/
+PETSC_DIR=/home/carlosadir/Git/petsc/
 # PETSC_ARCH=arch-linux-c-debug
-# PETSC_ARCH=arch-linux-c-opt
+PETSC_ARCH=arch-linux-c-opt
+MPIEXEC=${PETSC_DIR}/${PETSC_ARCH}/bin/mpiexec
 include ${PETSC_DIR}/lib/petsc/conf/variables
 include ${PETSC_DIR}/lib/petsc/conf/rules
 CFLAGS += -pedantic -std=c99
-pmax := 8
+pmax := 2
 folder := "results"
 
 all: run distclean
@@ -24,7 +25,7 @@ compilepoisson3D_ksp: poisson3D_ksp.o
 	-${CLINKER} -o poisson3D_ksp poisson3D_ksp.o ${PETSC_LIB}
 	${RM} poisson3D_ksp.o
 
-run2Dksp: compilepoisson2D_ksp
+run2Dksp: createfolder compilepoisson2D_ksp
 	{ \
 	set -e ;\
 	code="poisson2D_ksp";\
@@ -36,7 +37,7 @@ run2Dksp: compilepoisson2D_ksp
 			filename="${folder}/$${code}-p$${p}-mesh$${nx}x$${ny}.txt"; \
 			if [ -e $${filename} ]; then rm $${filename} ; fi ; \
 			executeone="./$${code} -da_grid_x $${nx} -da_grid_y $${ny} -log_view"; \
-			command="mpiexec --tag-output -np $${p} time -p $${executeone}"; \
+			command="${MPIEXEC} -prepend-rank -np $${p} time -p $${executeone}"; \
 			{ \
 				$${command} | cat >> $${filename}; \
 			} 2>> $${filename}; \
@@ -45,10 +46,10 @@ run2Dksp: compilepoisson2D_ksp
 	}
 
 
-run2Dsnes: compilepoisson2D_snes
+run2Dsnes: createfolder compilepoisson2D_snes
 	echo "Ham"
 
-run3Dksp: compilepoisson3D_ksp
+run3Dksp: createfolder compilepoisson3D_ksp
 	{ \
 	set -e ;\
 	code="poisson3D_ksp";\
@@ -61,7 +62,7 @@ run3Dksp: compilepoisson3D_ksp
 			filename="${folder}/$${code}-p$${p}-mesh$${nx}x$${ny}x$${nz}.txt"; \
 			if [ -e $${filename} ]; then rm $${filename} ; fi ; \
 			executeone="./$${code} -da_grid_x $${nx} -da_grid_y $${ny} -da_grid_z $${nz} -log_view"; \
-			command="mpiexec --tag-output -np $${p} time -p $${executeone}"; \
+			command="${MPIEXEC} -prepend-rank -np $${p} time -p $${executeone}"; \
 			{ \
 				$${command} | cat >> $${filename}; \
 			} 2>> $${filename}; \
@@ -71,6 +72,10 @@ run3Dksp: compilepoisson3D_ksp
 
 createfolder:
 	if [ ! -d ${folder} ]; then mkdir -p ${folder}; fi
+	echo PETSC_DIR=${PETSC_DIR}
+	echo PETSC_ARCH=${PETSC_ARCH}
+	echo MPIEXEC=${MPIEXEC}
+
 
 pythonrenamefolder:
 	python renamefolder.py

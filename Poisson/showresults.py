@@ -24,7 +24,42 @@ def readfile(filename):
 		lines = file.readlines()
 	return '\n'.join(lines)
 
-def show2D_ksp():
+
+def show2Dgraph_2D_ksp(folder, data):
+	files = get_files(folder)
+	files2D = []
+	for file in files:
+		if "2D_ksp" in file:
+			files2D.append(file)
+	tvals = {}
+	nvals = {}
+	for filename in files2D:
+		try:
+			p = int(filename.split("-p")[1].split("-mesh")[0])
+			n = int(filename.split("mesh")[1].split("x")[0])
+			texto = readfile(folder + "/" + filename)
+			t = float(re.findall(r"Processor 0 took ((\d+\.?\d*)|(\.\d+)) CPU seconds", texto)[0][0])
+			if p not in tvals:
+				tvals[p] = []
+				nvals[p] = []
+			tvals[p].append(t)
+			nvals[p].append(n)
+		except Exception as e:
+			print(f"For the file '{filename}', there was an error. Could not plot this value.")
+			# raise e
+	plt.figure()
+	for p in tvals:
+		plt.scatter(nvals[p], tvals[p], label="%d"%p)
+	ax = plt.gca()
+	ax.set_xscale("log")
+	ax.set_yscale("log")
+	ax.set_xlabel(r"Malha $n$")
+	ax.set_ylabel(r"Tempo $n$")
+	plt.legend()
+	plt.grid()
+	plt.title(f"Resultados 2D - {data}")
+
+def show3Dgraph_2D_ksp(folder, data):
 	files = get_files(folder)
 	files2D = []
 	for file in files:
@@ -46,7 +81,7 @@ def show2D_ksp():
 			p = int(filename.split("-p")[1].split("-mesh")[0])
 			n = int(filename.split("mesh")[1].split("x")[0])
 			texto = readfile(folder + "/" + filename)
-			t = float(re.findall(r"<stdout>:Processor 0 took ((\d+\.?\d*)|(\.\d+)) CPU seconds", texto)[0][0])
+			t = float(re.findall(r"Processor 0 took ((\d+\.?\d*)|(\.\d+)) CPU seconds", texto)[0][0])
 			p = np.log2(p)
 			n = np.log10(n)
 			t = np.log10(t)
@@ -81,13 +116,47 @@ def show2D_ksp():
 	ax.yaxis.set_major_locator(mticker.MaxNLocator(integer=True))
 	ax.zaxis.set_major_formatter(mticker.FuncFormatter(log10_tick_formatter))
 	ax.zaxis.set_major_locator(mticker.MaxNLocator(integer=True))
-	plt.title("Resultados 2D - 2022 julho 04 - 11:02")
+	plt.title(f"Resultados 2D - {data}")
 	plt.show()
 
 
 
+def show2Dgraph_3D_ksp(folder, data):
+	files = get_files(folder)
+	files3D = []
+	for file in files:
+		if "3D_ksp" in file:
+			files3D.append(file)
+	tvals = {}
+	nvals = {}
+	for filename in files3D:
+		try:
+			p = int(filename.split("-p")[1].split("-mesh")[0])
+			n = int(filename.split("mesh")[1].split("x")[0])
+			texto = readfile(folder + "/" + filename)
+			t = float(re.findall(r"Processor 0 took ((\d+\.?\d*)|(\.\d+)) CPU seconds", texto)[0][0])
+			if p not in tvals:
+				tvals[p] = []
+				nvals[p] = []
+			tvals[p].append(t)
+			nvals[p].append(n)
+		except Exception as e:
+			print(f"For the file '{filename}', there was an error. Could not plot this value.")
+			# raise e
+	plt.figure()
+	for p in tvals:
+		plt.scatter(nvals[p], tvals[p], label="%d"%p)
+	ax = plt.gca()
+	ax.set_xscale("log")
+	ax.set_yscale("log")
+	ax.set_xlabel(r"Malha $n$")
+	ax.set_ylabel(r"Tempo $n$")
+	plt.legend()
+	plt.grid()
+	plt.title(f"Resultados 3D - {data}")
 
-def show3D_ksp():
+
+def show3Dgraph_3D_ksp(folder, data):
 	files = get_files(folder)
 	files3D = []
 	for file in files:
@@ -105,7 +174,7 @@ def show3D_ksp():
 			p = int(filename.split("-p")[1].split("-mesh")[0])
 			n = int(filename.split("mesh")[1].split("x")[0])
 			texto = readfile(folder + "/" + filename)
-			t = float(re.findall(r"<stdout>:Processor 0 took ((\d+\.?\d*)|(\.\d+)) CPU seconds", texto)[0][0])
+			t = float(re.findall(r"Processor 0 took ((\d+\.?\d*)|(\.\d+)) CPU seconds", texto)[0][0])
 			p = np.log2(p)
 			n = np.log10(n)
 			t = np.log10(t)
@@ -139,11 +208,14 @@ def show3D_ksp():
 	ax.yaxis.set_major_locator(mticker.MaxNLocator(integer=True))
 	ax.zaxis.set_major_formatter(mticker.FuncFormatter(log10_tick_formatter))
 	ax.zaxis.set_major_locator(mticker.MaxNLocator(integer=True))
-	plt.title("Resultados 3D - 2022 julho 04 - 11:02")
+	plt.title(f"Resultados 3D - {data}")
 	
 
 if __name__ == "__main__":
-	folder = "results_2022-07-04-11-02"
-	show2D_ksp()
-	show3D_ksp()
+	folder = "results_2022-07-07-09-48"
+	data = "Teste"
+	show2Dgraph_2D_ksp(folder, data)
+	show2Dgraph_3D_ksp(folder, data)
+	# show3Dgraph_2D_ksp(folder, data)
+	# show3Dgraph_3D_ksp(folder, data)
 	plt.show()
