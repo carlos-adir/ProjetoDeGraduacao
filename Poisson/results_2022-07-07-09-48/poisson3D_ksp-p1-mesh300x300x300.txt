@@ -1,0 +1,4 @@
+[0] Command terminated by signal 9
+[0] real 26.66
+[0] user 18.90
+[0] sys 2.28
