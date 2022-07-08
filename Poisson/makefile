@@ -128,7 +128,7 @@ run: createfolder run2Dksp run3Dksp pythonrenamefolder
 
 runcolab2D: createfolder run2dkspcolab
 
-runcolab2D: createfolder run3dkspcolab
+runcolab3D: createfolder run3dkspcolab
 
 distclean:
 	@rm -f *~ poisson *tmp
