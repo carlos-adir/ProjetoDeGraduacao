@@ -1,0 +1,13 @@
+[0] tcmalloc: large alloc 2369527808 bytes == 0x565239d2c000 @  0x7f9b18e6ab6b 0x7f9b18e8a273 0x7f9b17998c1c 0x7f9b179992e9 0x7f9b17d93150 0x7f9b17d9a33a 0x7f9b18043991 0x7f9b1804cd56 0x7f9b17eb1083 0x7f9b1821fc86 0x7f9b182229a0 0x7f9b18225b01 0x5651eb457d98 0x7f9b16daac87 0x5651eb45717a
+[0] tcmalloc: large alloc 2369527808 bytes == 0x5653279ee000 @  0x7f9b18e6ab6b 0x7f9b18e8a273 0x7f9b17998c1c 0x7f9b179992e9 0x7f9b17dc05fa 0x7f9b17dc107a 0x7f9b17b37cb7 0x7f9b184a8844 0x7f9b18328d13 0x7f9b18220823 0x7f9b182229a0 0x7f9b18225b01 0x5651eb457d98 0x7f9b16daac87 0x5651eb45717a
+
+===================================================================================
+=   BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES
+=   PID 154095 RUNNING AT 9f9935957922
+=   EXIT CODE: 9
+=   CLEANING UP REMAINING PROCESSES
+=   YOU CAN IGNORE THE BELOW CLEANUP MESSAGES
+===================================================================================
+YOUR APPLICATION TERMINATED WITH THE EXIT STRING: Killed (signal 9)
+This typically refers to a problem with your application.
+Please see the FAQ page for debugging suggestions
