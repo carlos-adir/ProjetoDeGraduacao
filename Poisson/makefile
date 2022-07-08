@@ -70,6 +70,50 @@ run3Dksp: createfolder compilepoisson3D_ksp
 	done \
 	}
 
+
+
+run2Dkspcolab: createfolder compilepoisson2D_ksp
+	{ \
+	set -e ;\
+	code="poisson2D_ksp";\
+	echo "For code $${code}";\
+	for p in {1..${pmax}}; do \
+		for nx in 100 128 200 256 300 350 400 500 512 550 600 700 750 850 950 1000; do \
+			ny=$$nx; \
+			echo "    With $${p} processors and mesh $${nx} x $${ny}"; \
+			filename="${folder}/$${code}-p$${p}-mesh$${nx}x$${ny}.txt"; \
+			if [ -e $${filename} ]; then rm $${filename} ; fi ; \
+			executeone="./$${code} -da_grid_x $${nx} -da_grid_y $${ny} -log_view"; \
+			command="${MPIEXEC} -prepend-rank -np $${p} $${executeone}"; \
+			{ \
+				$${command} | cat >> $${filename}; \
+			} 2>> $${filename}; \
+		done \
+	done \
+	}
+
+
+run3Dkspcolab: createfolder compilepoisson3D_ksp
+	{ \
+	set -e ;\
+	code="poisson3D_ksp";\
+	echo "For code $${code}";\
+	for p in {1..${pmax}}; do \
+		for nx in 10 20 40 50 64 65 75 100 128 129 150 180 200; do \
+			ny=$$nx; \
+			nz=$$nx; \
+			echo "    With $${p} processors and mesh $${nx} x $${ny} x $${nz}"; \
+			filename="${folder}/$${code}-p$${p}-mesh$${nx}x$${ny}x$${nz}.txt"; \
+			if [ -e $${filename} ]; then rm $${filename} ; fi ; \
+			executeone="./$${code} -da_grid_x $${nx} -da_grid_y $${ny} -da_grid_z $${nz} -log_view"; \
+			command="${MPIEXEC} -prepend-rank -np $${p} $${executeone}"; \
+			{ \
+				$${command} | cat >> $${filename}; \
+			} 2>> $${filename}; \
+		done \
+	done \
+	}
+
 createfolder:
 	if [ ! -d ${folder} ]; then mkdir -p ${folder}; fi
 	echo PETSC_DIR=${PETSC_DIR}
@@ -81,6 +125,10 @@ pythonrenamefolder:
 	python renamefolder.py
 
 run: createfolder run2Dksp run3Dksp pythonrenamefolder
+
+runcolab2D: createfolder run2dkspcolab
+
+runcolab2D: createfolder run3dkspcolab
 
 distclean:
 	@rm -f *~ poisson *tmp
