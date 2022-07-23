@@ -15,8 +15,7 @@ dependencies: createfolder
 	sudo apt-get install make
 
 clonepetsc: dependencies
-	~Git/ && git clone -b release https://gitlab.com/petsc/petsc.git petsc --depth 1 ${PETSC_DIR}
+	git clone -b release https://gitlab.com/petsc/petsc.git petsc --depth 1 ${PETSC_DIR}
 
 instpestc: clonepetsc
     (cd ${PETSC_DIR} && ./configure --download-mpich --with-debugging=no)
-	
