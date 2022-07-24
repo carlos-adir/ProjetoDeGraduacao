@@ -1,20 +1,24 @@
 #!/bin/bash
 .SILENT:
 .DEFAULT_GOAL := all
-HOME_DIR?=${shell pwd}
-GIT_DIR=~/Git/
+HOME_DIR?=${shell cd ~ && pwd}
+GIT_DIR=${HOME_DIR}/Git
 PETSC_DIR=${GIT_DIR}/petsc/
 PETSC_ARCH=arch-linux-c-opt
 
 all: createfolder dependencies clonepetsc instpestc
 
 createfolder:
-	if [ ! -d ${GIT_DIR} ]; then mkdir -p ${GIT_DIR}; fi
+	(cd ~; \
+	echo HOME_DIR=${HOME_DIR}; \
+	echo GIT_DIR=${GIT_DIR}; \
+	echo PETSC_DIR=${PETSC_DIR}; \
+	if [ ! -d ${GIT_DIR} ]; then mkdir -p ${GIT_DIR}; fi)
 
-dependencies: 
-	sudo apt-get install git
-	sudo apt-get install gcc
-	sudo apt-get install make
+dependencies:
+	sudo apt-get install git -y
+	sudo apt-get install gcc -y
+	sudo apt-get install make -y
 
 clonepetsc: createfolder dependencies
 	(cd ${GIT_DIR}; \
