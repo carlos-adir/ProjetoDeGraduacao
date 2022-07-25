@@ -1,8 +1,7 @@
-from Poisson.read_data_from_files import getdata_pnt
-from read_data_from_files import getdata_2Dksp, getdata_3Dksp
+from read_data_from_files import getdata_pnt
 from matplotlib import pyplot as plt
 from typing import List, Tuple, Dict
-import numpy as np
+import sys
 
 def get_pvals(results: List[Tuple[int, int, float]]) -> List[int]:
     pvals = []
@@ -52,8 +51,8 @@ def show2Dgraph(results: List[Tuple[int, int, float]], title: str):
 
 def main():
     mainfolder = (sys.argv[0]).replace("showresults.py", "")
-    folder = mainfolder + "results_googlecloud4-2022-07-23"
-    data = "Google Cloud - e2-highcpu-4 - 23 julho 2022"
+    folder = mainfolder + "results_googlecloud8-2022-07-24"
+    data = "Google Cloud - e2-highcpu-8 - 23 julho 2022"
     results = getdata_pnt(folder, "2D_ksp")
     show2Dgraph(results, "Resultados 2D - " + data)
     results = getdata_pnt(folder, "3D_ksp")

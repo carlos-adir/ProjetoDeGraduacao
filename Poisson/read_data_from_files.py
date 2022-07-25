@@ -56,6 +56,8 @@ def get_problem_files(folder: str) -> List[str]:
 def getdata_pnt(folder: str, key: str) -> List[Tuple[int, int, float]]:
     """
     Given a folder, it makes a search in this folders, gets all the filenames
+    Then it filters using the 'key':
+        We search only in the files which has the 'key' inside it
     Then it returns a list with the data (p, n, t)
         p is the number os CPUs used
         n is the mesh size
