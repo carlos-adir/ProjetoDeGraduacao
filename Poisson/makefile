@@ -32,7 +32,7 @@ run2Dksp: createfolder compilepoisson2D_ksp
 	set -e ;\
 	code="poisson2D_ksp";\
 	echo "For code $${code}";\
-	for nx in 100 128 200 256 300 350 400 500 512 550 600 700 750 850 950 1000 1100 1250 1300 1400 1500 2000; do \
+	for nx in 50 63 64 65 100 128 129 140 150 175 200 225 256 257 300 325 350 400 450 500 512 513 550 600 650 700 750 850 950 1000 1100 1250 1300 1400 1500 2000 3000 5000 7500 10000; do \
 		for p in {1..${pmax}}; do \
 			ny=$$nx; \
 			echo "    With $${p} processors and mesh $${nx} x $${ny}"; \
@@ -57,7 +57,7 @@ run3Dksp: createfolder compilepoisson3D_ksp
 	set -e ;\
 	code="poisson3D_ksp";\
 	echo "For code $${code}";\
-	for nx in 10 20 40 50 64 65 75 100 128 129 150 180 200 230 250 300 320 350 400; do \
+	for nx in 5 10 12 15 16 17 18 20 25 30 32 33 35 40 45 50 63 64 65 75 100 127 128 129 150 180 200 230 250 255 256 257 300 320 350 400 511 512 513; do \
 		for p in {1..${pmax}}; do \
 			ny=$$nx; \
 			nz=$$nx; \
@@ -128,10 +128,14 @@ createfolder:
 	if [ ! -d ${FOLDER} ]; then mkdir -p ${FOLDER}; fi
 
 
-pythonrenamefolder:
+pythonremovefiles: run2Dksp run3Dksp
+	python removenonusefulfiles.py
+
+
+renamefolder:
 	python renamefolder.py
 
-run: createfolder run2Dksp pythorenamefolder
+run: createfolder pythonremovefiles run2Dksp run3Dksp
 
 runcolab2D: createfolder run2dkspcolab
 
