@@ -53,24 +53,18 @@ def get_problem_files(folder: str) -> List[str]:
             problems.append(filename)
     return problems
 
-def getdata_2Dksp(folder: str) -> List[Tuple[int, int, float]]:
-    files = get_files(folder)
-    files2D = filter_files(files, "2D_ksp")
+def getdata_pnt(folder: str, key: str) -> List[Tuple[int, int, float]]:
+    """
+    Given a folder, it makes a search in this folders, gets all the filenames
+    Then it returns a list with the data (p, n, t)
+        p is the number os CPUs used
+        n is the mesh size
+        t is the time consumed by the algorithm
+    """
+    allfiles = get_files(folder)
+    filenames = filter_files(allfiles, key)
     results = []
-    for filename in files2D:
-        try:
-            p, n, t = get_pnt(folder + "/" + filename)
-            results.append((p, n, t))
-        except Exception as e:
-            print(f"For the file '{filename}', there was an error. Could not plot this value.")
-    return results
-
-
-def getdata_3Dksp(folder: str) -> List[Tuple[int, int, float]]:
-    files = get_files(folder)
-    files3D = filter_files(files, "3D_ksp")
-    results = []
-    for filename in files3D:
+    for filename in filenames:
         try:
             p, n, t = get_pnt(folder + "/" + filename)
             results.append((p, n, t))

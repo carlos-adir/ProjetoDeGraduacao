@@ -1,3 +1,4 @@
+from Poisson.read_data_from_files import getdata_pnt
 from read_data_from_files import getdata_2Dksp, getdata_3Dksp
 from matplotlib import pyplot as plt
 from typing import List, Tuple, Dict
@@ -49,13 +50,15 @@ def show2Dgraph(results: List[Tuple[int, int, float]], title: str):
     plt.grid()
     plt.title(title)
 
-if __name__ == "__main__":
-    import sys
+def main():
     mainfolder = (sys.argv[0]).replace("showresults.py", "")
     folder = mainfolder + "results_googlecloud4-2022-07-23"
     data = "Google Cloud - e2-highcpu-4 - 23 julho 2022"
-    results = getdata_2Dksp(folder)
+    results = getdata_pnt(folder, "2D_ksp")
     show2Dgraph(results, "Resultados 2D - " + data)
-    results = getdata_3Dksp(folder)
+    results = getdata_pnt(folder, "3D_ksp")
     show2Dgraph(results, "Resultados 3D - " + data)
     plt.show()
+
+if __name__ == "__main__":
+    main()
