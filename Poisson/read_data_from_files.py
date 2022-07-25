@@ -43,6 +43,16 @@ def get_pnt(filename: str) -> Tuple[int, int, float]:
     t = float(re.findall(r"Processor 0 took ((\d+\.?\d*)|(\.\d+)) CPU seconds", texto)[0][0])
     return p, n, t
 
+def get_problem_files(folder: str) -> List[str]:
+    filenames = get_files(folder)
+    problems = []
+    for filename in filenames:
+        try:
+            p, n, t = get_pnt(folder + "/" + filename)
+        except Exception as e:
+            problems.append(filename)
+    return problems
+
 def getdata_2Dksp(folder: str) -> List[Tuple[int, int, float]]:
     files = get_files(folder)
     files2D = filter_files(files, "2D_ksp")
