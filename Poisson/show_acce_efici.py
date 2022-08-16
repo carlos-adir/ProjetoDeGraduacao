@@ -57,7 +57,7 @@ def show2D_SpeedUp(results: List[Tuple[int, int, float]], title: str):
         ps, ts = zip(*sorted(zip(pvals[n], tvals[n])))
         if ps[0] != 1:
             continue
-        phi = np.array(ts)/ts[0]
+        phi = ts[0]/np.array(ts)
         plt.plot(ps[1:], phi[1:], marker=".", label="%d"%n)
     ax = plt.gca()
     ax.set_xscale("log")
@@ -76,7 +76,7 @@ def show2D_Efficiency(results: List[Tuple[int, int, float]], title: str):
         ps, ts = zip(*sorted(zip(pvals[n], tvals[n])))
         if ps[0] != 1:
             continue
-        phi = np.array(ts)/ts[0]
+        phi = ts[0]/np.array(ts)
         eps = phi/ps
         plt.plot(ps[1:], eps[1:], marker=".", label="%d"%n)
     ax = plt.gca()
@@ -94,7 +94,7 @@ def main():
     results = getdata_pnt(folder, "2D_ksp")
     show2D_TvsP(results, "Resultados 2D - " + data)
     show2D_SpeedUp(results, "Resultados 2D - SpeedUp - " + data)
-    show2D_Efficiency(results, "Resultados 2D - SpeedUp - " + data)
+    show2D_Efficiency(results, "Resultados 2D - Eficiencia - " + data)
     
     plt.show()
 
