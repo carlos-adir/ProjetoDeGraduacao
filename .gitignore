@@ -1,6 +1,7 @@
 petsc/*
 p4pdes/*
-*/results/*
 *.o
 !*.c
 !makefile
+PG2-Relatorio/*
+*/__pycache__/*
