@@ -37,6 +37,8 @@ def show2D_TvsP(results: List[Tuple[int, int, float]], title: str):
     tvals = get_tvals(results)
     plt.figure()
     for n in nvals:
+        if n < 1000:
+            continue
         ps, ts = zip(*sorted(zip(pvals[n], tvals[n])))
         plt.plot(ps, ts, marker=".", label="%d"%n)
     ax = plt.gca()
@@ -54,6 +56,8 @@ def show2D_SpeedUp(results: List[Tuple[int, int, float]], title: str):
     tvals = get_tvals(results)
     plt.figure()
     for n in nvals:
+        if n < 1000:
+            continue
         ps, ts = zip(*sorted(zip(pvals[n], tvals[n])))
         if ps[0] != 1:
             continue
@@ -73,6 +77,8 @@ def show2D_Efficiency(results: List[Tuple[int, int, float]], title: str):
     tvals = get_tvals(results)
     plt.figure()
     for n in nvals:
+        if n < 1000:
+            continue
         ps, ts = zip(*sorted(zip(pvals[n], tvals[n])))
         if ps[0] != 1:
             continue
@@ -89,16 +95,14 @@ def show2D_Efficiency(results: List[Tuple[int, int, float]], title: str):
 
 def main():
     mainfolder = (sys.argv[0]).replace("show_acce_efici.py", "")
-    folder = mainfolder + "results_googlecloud8-2022-07-24"
+    pasta = "results-e2standard8-16-08-2022"
+    folder = mainfolder + pasta
     data = "Google Cloud - e2-highcpu-8 - 24 julho 2022"
     results = getdata_pnt(folder, "2D_ksp")
     show2D_TvsP(results, "Resultados 2D - " + data)
     show2D_SpeedUp(results, "Resultados 2D - SpeedUp - " + data)
     show2D_Efficiency(results, "Resultados 2D - Eficiencia - " + data)
-    
     plt.show()
-
-
 
 if __name__ == "__main__":
     main()
