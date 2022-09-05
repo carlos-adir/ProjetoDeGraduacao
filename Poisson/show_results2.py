@@ -3,6 +3,29 @@ from matplotlib import pyplot as plt
 import sys
 from typing import List, Tuple, Dict, Iterable, Optional
 from read_data_from_files import getdata_pnt
+try:
+    from compmec.nurbs import SplineCurve, SplineBaseFunction
+    from compmec.nurbs.knotspace import GeneratorKnotVector
+    doregressao = True
+except:
+    import os
+    os.system("pip install compmec-nurbs")
+    from compmec.nurbs import SplineCurve, SplineBaseFunction
+    from compmec.nurbs.knotspace import GeneratorKnotVector
+    doregressao = True
+
+def regressao(x: Iterable[float], y: Iterable[float], t: Iterable[float]=None):
+    points = np.array([x, y]).T
+    knotvec = GeneratorKnotVector.uniform(p=2, n=5)
+    splinefunc = SplineBaseFunction(knotvec)
+    ubar = (x-np.min(x))/(np.max(x)-np.min(x))
+    L = splinefunc(ubar)
+    points = np.linalg.solve(L @ L.T, L @ points)
+    curve = SplineCurve(splinefunc, points)
+    if t is None:
+        t = np.linspace(0, 1, 129)
+    return curve(t)
+
 
 def get_processors(results: List[Tuple[int, int, float]]):
     pairs = {}
@@ -136,7 +159,14 @@ def main1():
         mask = (allps == p)
         ns = allns[mask]
         ts = allts[mask]
-        plt.scatter(ns, ts, marker="+", color=colors[p-1], label=r"$p=%d$"%p)
+        if doregressao:
+            logns = np.log(ns)
+            logts = np.log(ts)
+            points = regressao(logns, logts)
+            nplot = np.exp(points[:, 0])
+            tplot = np.exp(points[:, 1])
+            plt.plot(nplot, tplot, ls="dotted", color=colors[p-1])
+        # plt.scatter(ns, ts, marker="+", color=colors[p-1], label=r"$p=%d$"%p)
     plt.xlabel(r"Numero de malha $n$")
     plt.ylabel(r"Tempo $t$ (s)")
     ax.set_xscale("log")
@@ -155,9 +185,14 @@ def main2():
     nselect = get_nselect()
     fig = plt.figure()
     ax = plt.gca()
+    pdisc = np.arange(1, 9)
     for i, n in enumerate(nselect):
         mask = (allns == n)
-        plt.scatter(allps[mask], allts[mask], marker="+", color=colors[i], label=r"$n=%d$"%n)
+        ps = allps[mask]
+        ts = allts[mask]
+        tdisc = [np.mean(ts[ps==p]) for p in pdisc]
+        plt.plot(pdisc, tdisc, color=colors[i], ls="dashed")
+        plt.scatter(ps, ts, marker="+", color=colors[i], label=r"$n=%d$"%n)
     ax.set_yscale("log")
     ax.set_ylabel(r"Tempo $t$ (s)")
     ax.set_xlabel(r"Processadores $p$")
@@ -177,9 +212,11 @@ def main3():
     ax = plt.gca()
     # fs = np.linspace(0, 0.2, 5)
     pplot = np.linspace(1, 8, 1025)
-    fs = [0, 0.02, 0.05, 0.15]
+    pdisc = np.arange(2, 9)
+    fs = [0, 0.01, 0.05, 0.1, 0.2]
     dottedlines = []
     solidlines = []
+    psimax = 8
     for i, f in enumerate(fs):
         psi = 1/(f + (1-f)/pplot)
         dotline, = plt.plot(pplot, psi, ls="dotted", color=colorsdot[i], label=r"$f=%.2f$"%f)
@@ -192,6 +229,9 @@ def main3():
         ps = allps[maskn * maskpO]
         ts = allts[maskn * maskpO]
         psi = tp1/ts
+        psimax = max(psimax, np.max(psi))
+        psidisc = [np.mean(psi[ps==p]) for p in pdisc]
+        plt.plot(pdisc, psidisc , color=colors[i], ls="dashed")
         solline = plt.scatter(ps, psi, color=colors[i], marker="+", label=r"$n=%d$"%n)
         solidlines.append(solline)
     first_legend = plt.legend(handles=dottedlines, loc='lower right')
@@ -199,7 +239,7 @@ def main3():
     plt.legend(handles=solidlines, loc='upper left')
     plt.grid()
     plt.xlim(1.5, 8.5)
-    plt.ylim(0, 8)
+    plt.ylim(0, 1.1*psimax)
     ax.set_ylabel(r"Aceleracao $\psi$")
     ax.set_xlabel(r"Processadores $p$")
     plt.savefig("Poisson/img/AceleracaoXProc_" + tipo + "_n" + size + ".png")
@@ -213,17 +253,18 @@ def main4():
     """
     nselect = get_nselect()
     ps = np.arange(1, 9)
-    pref = np.linspace(2, 8, 129)
+    pplot = np.linspace(2, 8, 129)
     fig = plt.figure()
     ax = plt.gca()
     # fs = np.linspace(0, 0.2, 5)
-    fs = [0, 0.02, 0.05, 0.15]
+    pdisc = np.arange(2, 9)
+    fs = [0, 0.01, 0.05, 0.1, 0.2]
     dottedlines = []
     solidlines = []
     for i, f in enumerate(fs):
-        psi = 1/(f + (1-f)/pref)
-        eps = psi/pref
-        dotline, = plt.plot(pref, eps, color=colorsdot[i], ls="dotted", label=r"$f=%.2f$"%f)
+        psi = 1/(f + (1-f)/pplot)
+        eps = psi/pplot
+        dotline, = plt.plot(pplot, eps, color=colorsdot[i], ls="dotted", label=r"$f=%.2f$"%f)
         dottedlines.append(dotline)
     maxeps = 1
     for i, n in enumerate(nselect):
@@ -236,6 +277,8 @@ def main4():
         psi = tp1/ts
         eps = psi/ps
         maxeps = max(maxeps, np.max(eps))
+        epsdisc = [np.mean(eps[ps==p]) for p in pdisc]
+        plt.plot(pdisc, epsdisc , color=colors[i], ls="dashed")
         solline = plt.scatter(ps, eps, color=colors[i], marker="+", label=r"$n=%d$"%n)
         solidlines.append(solline)
     first_legend = plt.legend(handles=dottedlines, loc='lower right')
@@ -249,6 +292,46 @@ def main4():
     plt.savefig("Poisson/img/EficiXProc_" + tipo + "_n" + size + ".png")
     plt.close(fig)
 
+def main5():
+    """
+    Plota gráficos - Karpflat
+        * numero de processadores
+        * eficiencia
+    """
+    nselect = get_nselect()
+    psdisc = np.arange(1, 9)
+    pplot = np.linspace(2, 8, 129)
+    fig = plt.figure()
+    ax = plt.gca()
+    # fs = np.linspace(0, 0.2, 5)
+    # fs = [0.01, 0.05, 0.1, 0.2, 0.5, 1]
+    dottedlines = []
+    solidlines = []
+    for i, n in enumerate(nselect):
+        maskn = (allns == n)
+        maskp1 = (allps == 1)
+        maskpO = (allps > 1)
+        tp1 = np.mean(allts[maskn * maskp1])
+        ps = allps[maskn * maskpO]
+        ts = allts[maskn * maskpO]
+        psi = tp1/ts
+        evals = (1/psi)-(1/ps)
+        evals /= 1-(1/ps)
+        evalsdisc = [np.mean(evals[ps==p]) for p in psdisc]
+        plt.plot(psdisc, evalsdisc, ls="dashed", color=colors[i])
+        solline = plt.scatter(ps, evals, color=colors[i], marker="+", label=r"$n=%d$"%n)
+        solidlines.append(solline)
+    # first_legend = plt.legend(handles=dottedlines, loc='lower right')
+    # plt.gca().add_artist(first_legend)
+    plt.legend(handles=solidlines, loc='upper left')
+    plt.grid()
+    plt.xlim(1.5, 8.5)
+    # plt.ylim(0, 1.1*maxeps)
+    ax.set_ylabel(r"Karp flat $\varepsilon$")
+    ax.set_xlabel(r"Processadores $p$")
+    # plt.show()
+    plt.savefig("Poisson/img/KarpXProc_" + tipo + "_n" + size + ".png")
+    plt.close(fig)
 
 # Programação Paralela para o método de diferenças finitas para o problema de Poisson
 
@@ -260,7 +343,9 @@ if __name__ == "__main__":
         allps, allns, allts = get_table(tipo)
         main1()
         for size in ["small", "med", "big"]:
+        # for size in ["big"]:
             main2()
             main3()
             main4()
+            main5()
     # plt.show()
