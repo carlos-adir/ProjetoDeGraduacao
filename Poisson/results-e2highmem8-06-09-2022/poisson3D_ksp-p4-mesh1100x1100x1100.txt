@@ -1,0 +1,26 @@
+[3] [3]PETSC ERROR: [3] --------------------- Error Message --------------------------------------------------------------
+[3] [3]PETSC ERROR: [3] Argument out of range
+[3] [3]PETSC ERROR: [3] 2326225000 is too big for PetscInt, you may need to ./configure using --with-64-bit-indices
+[3] [3]PETSC ERROR: [3] See https://petsc.org/release/faq/ for trouble shooting.
+[3] [3]PETSC ERROR: [3] Petsc Release Version 3.17.4, unknown 
+[3] [3]PETSC ERROR: [3] ./poisson3D_ksp on a arch-linux-c-opt named instance-2 by carlos_adir_leite Tue Sep  6 10:45:39 2022
+[3] [3]PETSC ERROR: [3] Configure options --download-mpich --with-debugging=no --download-f2cblaslapack=1
+[3] [3]PETSC ERROR: [3] #1 PetscIntCast() at /home/carlos_adir_leite/Git/petsc/include/petscsys.h:1967
+[3] [3]PETSC ERROR: [3] #2 MatSeqAIJSetPreallocation_SeqAIJ() at /home/carlos_adir_leite/Git/petsc/src/mat/impls/aij/seq/aij.c:4020
+[3] [3]PETSC ERROR: [3] #3 MatSeqAIJSetPreallocation() at /home/carlos_adir_leite/Git/petsc/src/mat/impls/aij/seq/aij.c:3963
+[3] [3]PETSC ERROR: [3] #4 MatMPIAIJSetPreallocation_MPIAIJ() at /home/carlos_adir_leite/Git/petsc/src/mat/impls/aij/mpi/mpiaij.c:2845
+[3] [3]PETSC ERROR: [3] #5 MatMPIAIJSetPreallocation() at /home/carlos_adir_leite/Git/petsc/src/mat/impls/aij/mpi/mpiaij.c:4043
+[3] [3]PETSC ERROR: [3] #6 DMCreateMatrix_DA_3d_MPIAIJ() at /home/carlos_adir_leite/Git/petsc/src/dm/impls/da/fdda.c:1427
+[3] [3]PETSC ERROR: [3] #7 DMCreateMatrix_DA() at /home/carlos_adir_leite/Git/petsc/src/dm/impls/da/fdda.c:766
+[3] [3]PETSC ERROR: [3] #8 DMCreateMatrix() at /home/carlos_adir_leite/Git/petsc/src/dm/interface/dm.c:1432
+[3] [3]PETSC ERROR: [3] #9 KSPSetUp() at /home/carlos_adir_leite/Git/petsc/src/ksp/ksp/interface/itfunc.c:332
+[3] [3]PETSC ERROR: [3] #10 KSPSolve_Private() at /home/carlos_adir_leite/Git/petsc/src/ksp/ksp/interface/itfunc.c:843
+[3] [3]PETSC ERROR: [3] #11 KSPSolve() at /home/carlos_adir_leite/Git/petsc/src/ksp/ksp/interface/itfunc.c:1078
+[3] [3]PETSC ERROR: [3] #12 main() at /home/carlos_adir_leite/Git/ProjetoDeGraduacao/Poisson/poisson3D_ksp.c:56
+[3] [3]PETSC ERROR: [3] PETSc Option Table entries:
+[3] [3]PETSC ERROR: [3] -da_grid_x 1100
+[3] [3]PETSC ERROR: [3] -da_grid_y 1100
+[3] [3]PETSC ERROR: [3] -da_grid_z 1100
+[3] [3]PETSC ERROR: [3] -log_view
+[3] [3]PETSC ERROR: [3] ----------------End of Error Message -------send entire error message to petsc-maint@mcs.anl.gov----------
+[3] application called MPI_Abort(MPI_COMM_WORLD, 63) - process 3
