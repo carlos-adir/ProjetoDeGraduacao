@@ -273,8 +273,7 @@ def test_logviewmemorytable_allfiles(listfiles: List[str]):
         table = get_logviewmemorytable(filename)
 
 def all_results_folders():
-    namefolders = ["results-e2highcpu4-23-07-2022",
-                   "results-e2highcpu8-01-09-2022",
+    namefolders = ["results-e2highcpu8-01-09-2022",
                    "results-e2highcpu8-02-09-2022",
                    "results-e2highcpu8-13-08-2022",
                    "results-e2highcpu8-24-07-2022",
@@ -286,6 +285,16 @@ def all_results_folders():
                    "results-e2memory8-26-08-2022",
                    "results-e2standard8-12-08-2022",
                    "results-e2standard8-16-08-2022"]
+    # namefolders = ["results-e2highcpu8-01-09-2022",
+    #                "results-e2highcpu8-02-09-2022",
+    #                "results-e2highcpu8-13-08-2022",
+    #                "results-e2highcpu8-24-07-2022",
+    #                "results-e2highcpu8-30-08-2022"]
+    # namefolders = ["results-e2highmem8-06-09-2022",
+    #                "results-e2highmem8-08-09-2022",
+    #                "results-e2memory8-22-08-2022",
+    #                "results-e2memory8-23-08-2022",
+    #                "results-e2memory8-26-08-2022"]
     return namefolders
 
 def get_listfiles_in_folders(folderslist: Iterable[str]):

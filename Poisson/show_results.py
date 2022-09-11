@@ -14,14 +14,14 @@ except:
     from compmec.nurbs.knotspace import GeneratorKnotVector
     doregressao = True
 
-def regressao(x: Iterable[float], y: Iterable[float], t: Iterable[float]=None) -> np.ndarray:
+def regressao_spline(x: Iterable[float], y: Iterable[float], t: Iterable[float]=None) -> np.ndarray:
     """
     Recebe pontos (x, y) e um vetor (t) chamado KnotVector (De Splines)
     E faz regressao usando SplineCurve,
     retornando o conjunto de pontos (x, y) que estão sobre a curva Spline
     """
     points = np.array([x, y]).T
-    knotvec = GeneratorKnotVector.uniform(p=2, n=5)
+    knotvec = GeneratorKnotVector.uniform(p=3, n=10)
     splinefunc = SplineBaseFunction(knotvec)
     ubar = (x-np.min(x))/(np.max(x)-np.min(x))
     L = splinefunc(ubar)
@@ -31,6 +31,18 @@ def regressao(x: Iterable[float], y: Iterable[float], t: Iterable[float]=None) -
         t = np.linspace(0, 1, 129)
     return curve(t)
 
+def regressao_linear(x: Iterable[float], y: Iterable[float]):
+    n = len(x)
+    L = np.ones((n, 2))
+    L[:, 1] = x[:]
+    y = np.array(y)
+    Sol = np.linalg.solve( L.T @ L, L.T @ y)
+    nplot = 129
+    t = np.linspace(0, 1, nplot)
+    points = np.zeros((nplot, 2))
+    points[:, 0] = t * np.max(x) + (1-t) * np.min(x)
+    points[:, 1] += Sol[0] + points[:, 0]*Sol[1]
+    return points
 
 def refine_vector(X: Iterable[float], n: Optional[int] = 10):
     """
@@ -46,7 +58,7 @@ def refine_vector(X: Iterable[float], n: Optional[int] = 10):
     return xvec
 
 
-def get_nplot(nlower: int=None, nupper: int=None) -> Tuple[int]:
+def get_nselect(nlower: int=None, nupper: int=None) -> Tuple[int]:
     """
     Retorna todos os valores de n que estao dentro de [nlower, nupper]
     """
@@ -104,7 +116,7 @@ def main1():
         if doregressao:
             logns = np.log(ns)
             logts = np.log(ts)
-            points = regressao(logns, logts)
+            points = regressao_spline(logns, logts)
             nplot = np.exp(points[:, 0])
             tplot = np.exp(points[:, 1])
             plt.plot(nplot, tplot, ls="dotted", color=colors[p-1])
@@ -273,12 +285,14 @@ def main5(nvals: Iterable[int]):
 
 def main6(listfilenames: Iterable[str], pfix: Optional[int] = None):
     """
-    Esse aqui val plotar o grafico, com eixo X nas abssissas o numero de malha
+    Com eixo X nas abssissas o numero de malha
     No eixo Y a razao r = (time evento)/tempo total
     apenas para os eventos que r > 0.02
     """
     allpoints = {}
-    eventstosave = ["VecMDot", "VecMAXPY", "MatMult", "MatSolve", "KSPSolve", "KSPGMRESOrthog", "PCApply"]
+    # eventstosave = ["VecMDot", "VecMAXPY", "MatMult", "MatSolve", "KSPSolve", "KSPGMRESOrthog", "PCApply"]
+    # eventstosave = ["VecMAXPY", "KSPSolve", "KSPGMRESOrthog", "PCApply"]
+    eventstosave = ["KSPSolve", "KSPGMRESOrthog"]
     for filename in listfilenames:
         p, n, t = get_pnt(filename)
         if t < 0:
@@ -299,10 +313,16 @@ def main6(listfilenames: Iterable[str], pfix: Optional[int] = None):
             if ev not in allpoints:
                 allpoints[ev] = []
             allpoints[ev].append((n, ra))
-    plt.figure()
+    fig = plt.figure()
     for i, (ev, points) in enumerate(allpoints.items()):
         points = np.array(points)
-        plt.scatter(points[:, 0], points[:, 1], color=colors[i], marker="+", label=ev)
+        nvals = points[:, 0]
+        rvals = points[:, 1]
+        plt.scatter(nvals, rvals, color=colors[i], marker=".", label=ev)
+        if doregressao:
+            pointsregressao = regressao_spline(np.log(nvals), rvals)
+            pointsregressao[:, 0] = np.exp(pointsregressao[:, 0])
+            plt.plot(pointsregressao[:, 0], pointsregressao[:, 1], color=colors[i], ls="dotted") 
     plt.gca().set_xscale("log")
     plt.legend()
     plt.xlabel(r"Tamanho de malha $n$")
@@ -311,13 +331,14 @@ def main6(listfilenames: Iterable[str], pfix: Optional[int] = None):
     else:
         plt.ylabel(r"Fração $\dfrac{T_{i}(n, p)}{T(n, p)}$")
     plt.grid()
-    #plt.show()
+    plt.savefig("Poisson/img/RazaoTempoXMalha_" + codigodim + ".png")
+    plt.close(fig)
 
 def main7(listfilenames: Iterable[str], pfix: Optional[int] = None):
     """
-    Esse aqui val plotar o grafico, com eixo X nas abssissas o numero de malha
-    No eixo Y a razao r = (time evento)/tempo total
-    apenas para os eventos que r > 0.02
+    Esse aqui val plotar o grafico, 
+    com eixo X nas abssissas o numero de malha
+    No eixo Y a memoria consumida
     """
     allpoints = {}
     objectstosave = ["Vector", "Matrix", "Index Set", "Krylov Solver", "IS L to G Mapping", "Distributed Mesh"]
@@ -341,17 +362,23 @@ def main7(listfilenames: Iterable[str], pfix: Optional[int] = None):
             if obj not in allpoints:
                 allpoints[obj] = []
             allpoints[obj].append((n, mem))
-    plt.figure()
+    fig = plt.figure()
     for i, (obj, points) in enumerate(allpoints.items()):
         points = np.array(points)
-        plt.scatter(points[:, 0], points[:, 1], color=colors[i], marker="+", label=obj)
+        nvals = points[:, 0]
+        mvals = points[:, 1]
+        plt.scatter(nvals, mvals, color=colors[i], marker="+", label=obj)
+        if doregressao:
+            pointsregressao = np.exp(regressao_linear(np.log(nvals), np.log(mvals)))
+            plt.plot(pointsregressao[:,0], pointsregressao[:,1], color=colors[i], ls="dotted") 
     plt.gca().set_xscale("log")
     plt.gca().set_yscale("log")
     plt.legend()
     plt.xlabel(r"Tamanho de malha $n$")
     plt.ylabel("Memória total consumida (GB)")
     plt.grid()
-    #plt.show()
+    plt.savefig("Poisson/img/MemoriaConsumidaXMalha_" + codigodim + ".png")
+    plt.close(fig)
             
 def main8(allfilenames: Iterable[str], nvals: Iterable[int]):
     """
@@ -381,14 +408,12 @@ def main8(allfilenames: Iterable[str], nvals: Iterable[int]):
         messages = table["Mess"]
         totalmessages = np.sum(messages)
         if totalmessages == 0:
-            print("totalmessages = 0 for the file")
-            print(filename)
             continue
         allpoints[n].append((p, totalmessages))
-    print("nvals = ", nvals)
+    fig = plt.figure()
     for i, n in enumerate(nvals):
         points = np.array(allpoints[n])
-        solline = plt.scatter(points[:, 0], points[:, 1], color=colors[i], marker="+", label=r"$n=%d$"%n)
+        solline = plt.scatter(points[:, 0], points[:, 1], marker="+", color=colors[i], label=r"$n=%d$"%n)
         solidlines.append(solline)
     # first_legend = plt.legend(handles=dottedlines, loc='lower right')
     # plt.gca().add_artist(first_legend)
@@ -397,19 +422,129 @@ def main8(allfilenames: Iterable[str], nvals: Iterable[int]):
     plt.grid()
     plt.xlim(1.5, 8.5)
     plt.ylim(ymin=1)
+    plt.title("Main 8")
     # plt.ylim(0, 1.1*maxeps)
     ax.set_yscale("log")
     ax.set_xlabel(r"Processadores $p$")
     ax.set_ylabel(r"Numero de mensagens")
     # plt.show()
-    # plt.savefig("Poisson/img/KarpXProc_" + codigodim + "_n" + size + ".png")
-    # plt.close(fig)
+    plt.savefig("Poisson/img/QuantidadeMessageXProc_" + codigodim + "_n" + size + ".png")
+    plt.close(fig)
 
 # Descoberta nova: para grandes valores de n, a quantidade de mensagens não muda...
 # https://petsc.org/release/docs/manualpages/Vec/VecMDot.html
 # https://petsc.org/release/docs/manualpages/Vec/VecMAXPY.html
 # Programação Paralela para o método de diferenças finitas para o problema de Poisson
 
+def main9(listfilenames: Iterable[str]):
+    """
+    Plota nos eixos:
+        numero de malhas
+        memória consumida
+    varias curvas de nivel, para diferentes processadores
+    """
+    allpoints = {}
+    for p in range(1, 9):
+        allpoints[p] = []
+    for filename in listfilenames:
+        p, n, t = get_pnt(filename)
+        if t < 0:
+            continue
+        table = get_logviewmemorytable(filename)
+        memories = np.array([line[3] for line in table], dtype="float64")
+        memories /= (2**30)  # Transformar bytes em GB
+        allpoints[p].append((n, np.sum(memories)))
+    fig = plt.figure()
+    for i, (p, points) in enumerate(allpoints.items()):
+        points = np.array(points)
+        nvals = points[:, 0]
+        mvals = points[:, 1]
+        plt.scatter(nvals, mvals, color=colors[i], marker="+", label="p=%d"%p)
+        if doregressao:
+            pointsregressao = np.exp(regressao_linear(np.log(nvals), np.log(mvals)))
+            plt.plot(pointsregressao[:,0], pointsregressao[:,1], color=colors[i], ls="dotted") 
+    plt.gca().set_xscale("log")
+    plt.gca().set_yscale("log")
+    plt.legend()
+    plt.xlabel(r"Tamanho de malha $n$")
+    plt.ylabel("Memória total consumida (GB)")
+    # plt.title("Main 9")
+    plt.grid()
+    plt.savefig("Poisson/img/MemoriaTotalConsumidaXMalha_" + codigodim + ".png")
+    plt.close(fig)
+    
+
+def main10(listfilenames: Iterable[str]):
+    """
+    Plota nos eixos:
+        numero de malhas
+        razao memória consumida: memoria paralela/memoria serial
+    varias curvas de nivel, para diferentes processadores
+    """
+    allpoints = {}
+    for filename in listfilenames:
+        p, n, t = get_pnt(filename)
+        if t < 0:
+            continue
+        table = get_logviewmemorytable(filename)
+        memories = np.array([line[3] for line in table], dtype="float64")
+        memories /= (2**30)  # Transformar bytes em GB
+        if n not in allpoints:
+            allpoints[n] = []
+        allpoints[n].append((p, np.sum(memories)))
+    fig = plt.figure()
+    for i, (n, points) in enumerate(allpoints.items()):
+        points = np.array(points)
+        pvals = points[:, 0]
+        mvals = points[:, 1]
+        maskp1 = (pvals == 1)
+        relativememory = mvals[~maskp1]/np.mean(mvals[maskp1])
+        plt.scatter(pvals[~maskp1], relativememory, marker="+", color="r")    
+    plt.legend()
+    plt.xlim(1.5, 8.5)
+    plt.xlabel(r"Tamanho de malha $n$")
+    plt.ylabel("Razao de memória consumida paralela/serial")
+    # plt.title("Main 10")
+    plt.grid()
+    plt.savefig("Poisson/img/RazaoMemoriaTotalXProc_" + codigodim + ".png")
+    plt.close(fig)
+
+
+def main11(listfilenames: Iterable[str]):
+    """
+    Eixo X: Numero de malha
+    Eixo Y: Razao do tempo KSPSolve / Tempo do processo
+    """
+    allpoints = {}
+    for p in range(1, 9):
+        allpoints[p] = []
+    for filename in listfilenames:
+        p, n, t = get_pnt(filename)
+        if t < 0:
+            continue
+        table = get_logvieweventstable(filename)
+        eventos = np.array(table["Event"])
+        timemax = np.array(table["Time (sec) Max"])
+        mask = (eventos == "KSPSolve")
+        razao = np.array(timemax)/t
+        allpoints[p].append((n, float(razao[mask])))
+    fig = plt.figure()
+    for i, (p, points) in enumerate(allpoints.items()):
+        points = np.array(points)
+        nvals = points[:, 0]
+        rvals = points[:, 1]
+        plt.scatter(nvals, rvals, color=colors[i], marker=".", label="p=%d"%p)
+        if doregressao:
+            pointsregressao = regressao_spline(np.log(nvals), rvals)
+            pointsregressao[:, 0] = np.exp(pointsregressao[:, 0])
+            plt.plot(pointsregressao[:, 0], pointsregressao[:, 1], color=colors[i], ls="dotted")
+    plt.gca().set_xscale("log")
+    plt.legend()
+    plt.xlabel(r"Tamanho de malha $n$")
+    plt.ylabel(r"Fração Tempo do KSPSolve/$T(n,p)$")
+    plt.grid()
+    plt.savefig("Poisson/img/FracaoTempoKSPSolveXMalha_" + codigodim + ".png")
+    plt.close(fig)
 
 if __name__ == "__main__":
     colors = ["tab:blue", "tab:orange", "tab:green", "tab:red", "tab:purple", "tab:brown", "tab:pink", "yellow"]
@@ -421,14 +556,17 @@ if __name__ == "__main__":
         allfilenames = get_listfiles_in_folders(allfoldernames)
         allfilenames = filter_files(allfilenames, codigodim)
         allps, allns, allts = get_pnt(allfilenames)
-        # main1()
+        main1()
         main6(allfilenames, pfix=4)
         main7(allfilenames, pfix=4)
+        main9(allfilenames)
+        main10(allfilenames)
+        main11(allfilenames)
         for size in ["small", "med", "big"]:
             nvals = get_nvals(codigodim, size)
-        #     main2(nvals)
-        #     main3(nvals)
-        #     main4(nvals)
-        #     main5(nvals)
+            main2(nvals)
+            main3(nvals)
+            main4(nvals)
+            main5(nvals)
             main8(allfilenames, nvals)
     plt.show()
