@@ -1,6 +1,5 @@
 import numpy as np
 from matplotlib import pyplot as plt
-
 import matplotlib.ticker as ticker
 
 
@@ -52,7 +51,8 @@ def gustafson():
     # ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: '{:g}'.format(x)))
     ax.set_xlabel(r"Número de processadores $p$")
     plt.grid()
-    
+
+
 def main():
     colorsdot = ["k", "tab:blue", "tab:orange", "tab:green", "tab:red", "tab:purple"]
     ahmdal()

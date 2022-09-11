@@ -1,20 +1,15 @@
 import sys
-from os import system
-from read_data_from_files import get_problem_files
-
-
-def delete_command(filename: str):
-    return "rm " + filename
-
+from os import remove
+from read_data_from_files import all_results_folders, get_listfiles_in_folders, get_problem_files
 
 def main():
     mainfolder = (sys.argv[0]).replace("removenonusefulfiles.py", "")
-    folder = mainfolder + "results_googlecloud8-2022-07-24"
-    filenames = get_problem_files(folder)
-    for filename in filenames:
-        command = delete_command(folder + "/" + filename)
-        print(f"Removing file {filename}")
-        system(command)
+    allfolders = [mainfolder + folder for folder in all_results_folders()]
+    listallfilenames = get_listfiles_in_folders(allfolders)
+    problemfiles = get_problem_files(listallfilenames)
+    print("Qtt problem files = ", len(problemfiles))
+    for filename in problemfiles:
+        remove(filename)
 
 if __name__ == "__main__":
     main()
