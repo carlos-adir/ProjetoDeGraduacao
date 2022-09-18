@@ -1,0 +1,134 @@
+[0] on 600 x 600 grid:  error |u-uexact|_inf = 1.24562e-06
+[0] Processor 0 took 9.948021 CPU seconds
+[1] Processor 1 took 9.948365 CPU seconds
+[2] Processor 2 took 9.948438 CPU seconds
+[3] Processor 3 took 9.948459 CPU seconds
+[0] **************************************** ***********************************************************************************************************************
+[0] ***                                WIDEN YOUR WINDOW TO 160 CHARACTERS.  Use 'enscript -r -fCourier9' to print this document                                 ***
+[0] ****************************************************************************************************************************************************************
+[0] 
+[0] ------------------------------------------------------------------ PETSc Performance Summary: -------------------------------------------------------------------
+[0] 
+[0] ./poisson2D_ksp on a arch-linux-c-opt named instance-1 with 4 processors, by carlos_adir_leite Sun Sep 11 18:52:23 2022
+[0] Using Petsc Release Version 3.17.4, unknown 
+[0] 
+[0]                          Max       Max/Min     Avg       Total
+[0] Time (sec):           9.949e+00     1.000   9.949e+00
+[0] Objects:              7.300e+01     1.000   7.300e+01
+[0] Flops:                1.812e+10     1.000   1.812e+10  7.249e+10
+[0] Flops/sec:            1.822e+09     1.000   1.822e+09  7.287e+09
+[0] MPI Msg Count:        4.864e+03     1.000   4.864e+03  1.946e+04
+[0] MPI Msg Len (bytes):  1.167e+07     1.000   2.399e+03  4.667e+07
+[0] MPI Reductions:       4.896e+03     1.000
+[0] 
+[0] Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
+[0]                             e.g., VecAXPY() for real vectors of length N --> 2N flops
+[0]                             and VecAXPY() for complex vectors of length N --> 8N flops
+[0] 
+[0] Summary of Stages:   ----- Time ------  ----- Flop ------  --- Messages ---  -- Message Lengths --  -- Reductions --
+[0]                         Avg     %Total     Avg     %Total    Count   %Total     Avg         %Total    Count   %Total
+[0]  0:      Main Stage: 9.9486e+00 100.0%  7.2492e+10 100.0%  1.946e+04 100.0%  2.399e+03      100.0%  4.878e+03  99.6%
+[0] 
+[0] ------------------------------------------------------------------------------------------------------------------------
+[0] See the 'Profiling' chapter of the users' manual for details on interpreting output.
+[0] Phase summary info:
+[0]    Count: number of times phase was executed
+[0]    Time and Flop: Max - maximum over all processors
+[0]                   Ratio - ratio of maximum to minimum over all processors
+[0]    Mess: number of messages sent
+[0]    AvgLen: average message length (bytes)
+[0]    Reduct: number of global reductions
+[0]    Global: entire computation
+[0]    Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
+[0]       %T - percent time in this phase         %F - percent flop in this phase
+[0]       %M - percent messages in this phase     %L - percent message lengths in this phase
+[0]       %R - percent reductions in this phase
+[0]    Total Mflop/s: 10e-6 * (sum of flop over all processors)/(max time over all processors)
+[0] ------------------------------------------------------------------------------------------------------------------------
+[0] Event                Count      Time (sec)     Flop                              --- Global ---  --- Stage ----  Total[0] 
+[0]                    Max Ratio  Max     Ratio   Max  Ratio  Mess   AvgLen  Reduct  %T %F %M %L %R  %T %F %M %L %R Mflop/s
+[0] ------------------------------------------------------------------------------------------------------------------------
+[0] 
+[0] --- Event Stage 0: Main Stage
+[0] 
+[0] BuildTwoSided          3 1.0 2.1478e-0338.4 0.00e+00 0.0 8.0e+00 4.0e+00 3.0e+00  0  0  0  0  0   0  0  0  0  0     0
+[0] BuildTwoSidedF         2 1.0 2.1333e-0357.1 0.00e+00 0.0 0.0e+00 0.0e+00 2.0e+00  0  0  0  0  0   0  0  0  0  0     0
+[0] DMCreateMat            1 1.0 3.0585e-02 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 7.0e+00  0  0  0  0  0   0  0  0  0  0     0
+[0] SFSetGraph             2 1.0 1.1458e-03 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+[0] SFSetUp                1 1.0 6.4363e-05 1.0 0.00e+00 0.0 1.6e+01 6.0e+02 1.0e+00  0  0  0  0  0   0  0  0  0  0     0
+[0] SFPack              2430 1.0 7.6176e-03 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+[0] SFUnpack            2430 1.0 5.0121e-04 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+[0] VecMDot             2352 1.0 2.5056e+00 1.0 6.54e+09 1.0 0.0e+00 0.0e+00 2.4e+03 25 36  0  0 48  25 36  0  0 48 10445
+[0] VecNorm             2432 1.0 3.4777e-01 1.1 4.38e+08 1.0 0.0e+00 0.0e+00 2.4e+03  3  2  0  0 50   3  2  0  0 50  5033
+[0] VecScale            2431 1.0 1.0653e-01 1.0 2.19e+08 1.0 0.0e+00 0.0e+00 0.0e+00  1  1  0  0  0   1  1  0  0  0  8215
+[0] VecCopy               79 1.0 1.2027e-02 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+[0] VecSet              2511 1.0 2.5910e-01 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  3  0  0  0  0   3  0  0  0  0     0
+[0] VecAXPY              158 1.0 1.4177e-02 1.0 2.84e+07 1.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  8024
+[0] VecMAXPY            2431 1.0 2.5644e+00 1.0 6.97e+09 1.0 0.0e+00 0.0e+00 0.0e+00 26 38  0  0  0  26 38  0  0  0 10866
+[0] VecScatterBegin     2430 1.0 2.3668e-02 1.0 0.00e+00 0.0 1.9e+04 2.4e+03 1.0e+00  0  0100100  0   0  0100100  0     0
+[0] VecScatterEnd       2430 1.0 1.4300e-02 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+[0] VecNormalize        2431 1.0 4.5585e-01 1.1 6.56e+08 1.0 0.0e+00 0.0e+00 2.4e+03  4  4  0  0 50   4  4  0  0 50  5760
+[0] MatMult             2430 1.0 1.6659e+00 1.0 1.97e+09 1.0 1.9e+04 2.4e+03 1.0e+00 17 11100100  0  17 11100100  0  4719
+[0] MatSolve            2431 1.0 2.4051e+00 1.0 1.96e+09 1.0 0.0e+00 0.0e+00 0.0e+00 24 11  0  0  0  24 11  0  0  0  3265
+[0] MatLUFactorNum         1 1.0 3.6138e-03 1.0 9.81e+05 1.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  1085
+[0] MatILUFactorSym        1 1.0 3.7421e-03 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+[0] MatAssemblyBegin       2 1.0 2.1732e-0329.7 0.00e+00 0.0 0.0e+00 0.0e+00 2.0e+00  0  0  0  0  0   0  0  0  0  0     0
+[0] MatAssemblyEnd         2 1.0 3.0729e-03 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 4.0e+00  0  0  0  0  0   0  0  0  0  0     0
+[0] MatGetRowIJ            1 1.0 4.2600e-07 1.4 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+[0] MatGetOrdering         1 1.0 5.4168e-04 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+[0] KSPSetUp               2 1.0 2.0154e-03 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 1.0e+01  0  0  0  0  0   0  0  0  0  0     0
+[0] KSPSolve               1 1.0 9.8857e+00 1.0 1.81e+10 1.0 1.9e+04 2.4e+03 4.8e+03 99100100100 99  99100100100 99  7333
+[0] KSPGMRESOrthog      2352 1.0 4.9127e+00 1.0 1.31e+10 1.0 0.0e+00 0.0e+00 2.4e+03 49 72  0  0 48  49 72  0  0 48 10654
+[0] PCSetUp                2 1.0 8.0029e-03 1.0 9.81e+05 1.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0   490
+[0] PCSetUpOnBlocks        1 1.0 7.9332e-03 1.0 9.81e+05 1.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0   494
+[0] PCApply             2431 1.0 2.6803e+00 1.0 1.96e+09 1.0 0.0e+00 0.0e+00 0.0e+00 27 11  0  0  0  27 11  0  0  0  2930
+[0] ------------------------------------------------------------------------------------------------------------------------
+[0] 
+[0] Memory usage is given in bytes:
+[0] 
+[0] Object Type          Creations   Destructions     Memory  Descendants' Mem.
+[0] Reports information only for process 0.
+[0] 
+[0] --- Event Stage 0: Main Stage
+[0] 
+[0]     Distributed Mesh     2              2        10656     0.
+[0]            Index Set     7              7      1451120     0.
+[0]    IS L to G Mapping     1              1       363084     0.
+[0]    Star Forest Graph     6              6         6960     0.
+[0]      Discrete System     2              2         1936     0.
+[0]            Weak Form     2              2         1248     0.
+[0]               Vector    43             43     26720656     0.
+[0]               Matrix     5              5     15837592     0.
+[0]        Krylov Solver     2              2        20488     0.
+[0]       Preconditioner     2              2         1952     0.
+[0]               Viewer     1              0            0     0.
+[0] ========================================================================================================================
+[0] Average time to get PetscTime(): 2.83e-08
+[0] Average time for MPI_Barrier(): 3.4756e-06
+[0] Average time for zero size MPI_Send(): 2.23e-06
+[0] #PETSc Option Table entries:
+[0] -da_grid_x 600
+[0] -da_grid_y 600
+[0] -log_view
+[0] #End of PETSc Option Table entries
+[0] Compiled without FORTRAN kernels
+[0] Compiled with full precision matrices (default)
+[0] sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8 sizeof(PetscInt) 4
+[0] Configure options: --download-mpich --with-debugging=no --download-f2cblaslapack=1
+[0] -----------------------------------------
+[0] Libraries compiled on 2022-09-11 18:42:22 on instance-1 
+[0] Machine characteristics: Linux-5.10.0-17-cloud-amd64-x86_64-with-glibc2.31
+[0] Using PETSc directory: /home/carlos_adir_leite/Git/petsc
+[0] Using PETSc arch: arch-linux-c-opt
+[0] -----------------------------------------
+[0] 
+[0] Using C compiler: /home/carlos_adir_leite/Git/petsc/arch-linux-c-opt/bin/mpicc  -Wall -Wwrite-strings -Wno-unknown-pragmas -Wno-lto-type-mismatch -fstack-protector -fvisibility=hidden -g -O   
+[0] -----------------------------------------
+[0] 
+[0] Using include paths: -I/home/carlos_adir_leite/Git/petsc/include -I/home/carlos_adir_leite/Git/petsc/arch-linux-c-opt/include
+[0] -----------------------------------------
+[0] 
+[0] Using C linker: /home/carlos_adir_leite/Git/petsc/arch-linux-c-opt/bin/mpicc
+[0] Using libraries: -Wl,-rpath,/home/carlos_adir_leite/Git/petsc/arch-linux-c-opt/lib -L/home/carlos_adir_leite/Git/petsc/arch-linux-c-opt/lib -lpetsc -Wl,-rpath,/home/carlos_adir_leite/Git/petsc/arch-linux-c-opt/lib -L/home/carlos_adir_leite/Git/petsc/arch-linux-c-opt/lib -lf2clapack -lf2cblas -lpthread -lm -ldl
+[0] -----------------------------------------
+[0] 

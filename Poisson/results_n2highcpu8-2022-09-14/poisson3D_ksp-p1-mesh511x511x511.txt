@@ -1,0 +1,25 @@
+[0] [0]PETSC ERROR: --------------------- Error Message --------------------------------------------------------------
+[0] [0]PETSC ERROR: MatSeqAIJSetPreallocation_SeqAIJ
+[0] [0]PETSC ERROR: See https://petsc.org/release/faq/ for trouble shooting.
+[0] [0]PETSC ERROR: Petsc Release Version 3.17.4, unknown 
+[0] [0]PETSC ERROR: ./poisson3D_ksp on a arch-linux-c-opt named instance-1 by carlos_adir_leite Wed Sep 14 18:41:58 2022
+[0] [0]PETSC ERROR: Configure options --download-mpich --with-debugging=no --download-f2cblaslapack=1
+[0] [0]PETSC ERROR: #1 PetscMallocAlign() at /home/carlos_adir_leite/Git/petsc/src/sys/memory/mal.c:49
+[0] [0]PETSC ERROR: #2 PetscMallocA() at /home/carlos_adir_leite/Git/petsc/src/sys/memory/mal.c:401
+[0] [0]PETSC ERROR: #3 MatSeqAIJSetPreallocation_SeqAIJ() at /home/carlos_adir_leite/Git/petsc/src/mat/impls/aij/seq/aij.c:4031
+[0] [0]PETSC ERROR: #4 MatSeqAIJSetPreallocation() at /home/carlos_adir_leite/Git/petsc/src/mat/impls/aij/seq/aij.c:3963
+[0] [0]PETSC ERROR: [0] #5 DMCreateMatrix_DA_3d_MPIAIJ() at /home/carlos_adir_leite/Git/petsc/src/dm/impls/da/fdda.c:1426
+[0] [0]PETSC ERROR: #6 DMCreateMatrix_DA() at /home/carlos_adir_leite/Git/petsc/src/dm/impls/da/fdda.c:766
+[0] [0]PETSC ERROR: #7 DMCreateMatrix() at /home/carlos_adir_leite/Git/petsc/src/dm/interface/dm.c:1432
+[0] [0]PETSC ERROR: [0] #8 KSPSetUp() at /home/carlos_adir_leite/Git/petsc/src/ksp/ksp/interface/itfunc.c:332
+[0] [0]PETSC ERROR: #9 KSPSolve_Private() at /home/carlos_adir_leite/Git/petsc/src/ksp/ksp/interface/itfunc.c:843
+[0] [0]PETSC ERROR: #10 KSPSolve() at /home/carlos_adir_leite/Git/petsc/src/ksp/ksp/interface/itfunc.c:1078
+[0] [0]PETSC ERROR: #11 main() at /home/carlos_adir_leite/Git/ProjetoDeGraduacao/Poisson/poisson3D_ksp.c:56
+[0] [0]PETSC ERROR: Reached the main program with an out-of-range error code 4031. This should never happen
+[0] [0]PETSC ERROR: [0] PETSc Option Table entries:
+[0] [0]PETSC ERROR: -da_grid_x 511
+[0] [0]PETSC ERROR: -da_grid_y 511
+[0] [0]PETSC ERROR: -da_grid_z 511
+[0] [0]PETSC ERROR: -log_view
+[0] [0]PETSC ERROR: ----------------End of Error Message -------send entire error message to petsc-maint@mcs.anl.gov----------
+[0] application called MPI_Abort(MPI_COMM_WORLD, 4031) - process 0
