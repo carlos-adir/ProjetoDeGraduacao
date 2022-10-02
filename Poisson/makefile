@@ -19,9 +19,6 @@ compilepoisson2D_ksp: poisson2D_ksp.o
 	-${CLINKER} -o poisson2D_ksp poisson2D_ksp.o ${PETSC_LIB}
 	${RM} poisson2D_ksp.o
 
-compilepoisson2D_snes: poisson2D_snes.o
-	-${CLINKER} -o poisson2D_snes poisson2D_snes.o ${PETSC_LIB}
-	${RM} poisson2D_snes.o
 
 compilepoisson3D_ksp: poisson3D_ksp.o
 	-${CLINKER} -o poisson3D_ksp poisson3D_ksp.o ${PETSC_LIB}
@@ -48,10 +45,6 @@ run2Dksp: createfolder compilepoisson2D_ksp
 	done \
 	}
 
-
-run2Dsnes: createfolder compilepoisson2D_snes
-	echo "Ham"
-
 run3Dksp: createfolder compilepoisson3D_ksp
 	{ \
 	set -e ;\
@@ -74,50 +67,6 @@ run3Dksp: createfolder compilepoisson3D_ksp
 	done \
 	}
 
-
-
-run2Dkspcolab: createfolder compilepoisson2D_ksp
-	{ \
-	set -e ;\
-	code="poisson2D_ksp";\
-	echo "For code $${code}";\
-	for p in {1..${pmax}}; do \
-		for nx in 100 128 200 256 300 350 400 500 512 550 600 700 750 850 950 1000; do \
-			ny=$$nx; \
-			echo "    With $${p} processors and mesh $${nx} x $${ny}"; \
-			filename="${FOLDER}/$${code}-p$${p}-mesh$${nx}x$${ny}.txt"; \
-			if [ -e $${filename} ]; then rm $${filename} ; fi ; \
-			executeone="./$${code} -da_grid_x $${nx} -da_grid_y $${ny} -log_view"; \
-			command="${MPIEXEC} -prepend-rank -np $${p} $${executeone}"; \
-			{ \
-				$${command} | cat >> $${filename}; \
-			} 2>> $${filename}; \
-		done \
-	done \
-	}
-
-
-run3Dkspcolab: createfolder compilepoisson3D_ksp
-	{ \
-	set -e ;\
-	code="poisson3D_ksp";\
-	echo "For code $${code}";\
-	for p in {1..${pmax}}; do \
-		for nx in 10 20 40 50 64 65 75 100 128 129 150 180 200; do \
-			ny=$$nx; \
-			nz=$$nx; \
-			echo "    With $${p} processors and mesh $${nx} x $${ny} x $${nz}"; \
-			filename="${FOLDER}/$${code}-p$${p}-mesh$${nx}x$${ny}x$${nz}.txt"; \
-			if [ -e $${filename} ]; then rm $${filename} ; fi ; \
-			executeone="./$${code} -da_grid_x $${nx} -da_grid_y $${ny} -da_grid_z $${nz} -log_view"; \
-			command="${MPIEXEC} -prepend-rank -np $${p} $${executeone}"; \
-			{ \
-				$${command} | cat >> $${filename}; \
-			} 2>> $${filename}; \
-		done \
-	done \
-	}
-
 createfolder:
 	echo HOME_DIR=${HOME_DIR}
 	echo GIT_DIR=${GIT_DIR}
@@ -131,15 +80,10 @@ createfolder:
 pythonremovefiles: run2Dksp run3Dksp
 	python removenonusefulfiles.py
 
-
 renamefolder:
 	python renamefolder.py
 
 run: createfolder pythonremovefiles run2Dksp run3Dksp
-
-runcolab2D: createfolder run2dkspcolab
-
-runcolab3D: createfolder run3dkspcolab
 
 distclean:
 	@rm -f *~ poisson *tmp

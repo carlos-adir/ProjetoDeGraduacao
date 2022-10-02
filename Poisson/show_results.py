@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 import sys
+import os
 from typing import List, Tuple, Dict, Iterable, Optional
 from read_data_from_files import *
 try:
@@ -127,7 +128,7 @@ def main1():
     ax.set_yscale("log")
     plt.grid()
     plt.legend(loc="lower right")
-    plt.savefig("Poisson/img/TempoLogXMalhaLog_" + codigodim + ".png")
+    plt.savefig(poissonfolder + "img/TempoLogXMalhaLog_" + codigodim + ".png")
     plt.close(fig)
 
 def main2(nvals: Iterable[int]):
@@ -150,7 +151,7 @@ def main2(nvals: Iterable[int]):
     ax.set_ylabel(r"Tempo $t$ (s)")
     ax.set_xlabel(r"Processadores $p$")
     plt.legend()
-    plt.savefig("Poisson/img/TempoLogXProc_" + codigodim + "_n" + size + ".png")
+    plt.savefig(poissonfolder + "img/TempoLogXProc_" + codigodim + "_n" + size + ".png")
     plt.close(fig)
 
 def main3(nvals: Iterable[int]):
@@ -193,7 +194,7 @@ def main3(nvals: Iterable[int]):
     plt.ylim(0, 1.1*psimax)
     ax.set_ylabel(r"Aceleracao $\psi$")
     ax.set_xlabel(r"Processadores $p$")
-    plt.savefig("Poisson/img/AceleracaoXProc_" + codigodim + "_n" + size + ".png")
+    plt.savefig(poissonfolder + "img/AceleracaoXProc_" + codigodim + "_n" + size + ".png")
     plt.close(fig)
     
 def main4(nvals: Iterable[int]):
@@ -239,7 +240,7 @@ def main4(nvals: Iterable[int]):
     plt.ylim(0, 1.1*maxeps)
     ax.set_ylabel(r"Eficiencia $\varepsilon$")
     ax.set_xlabel(r"Processadores $p$")
-    plt.savefig("Poisson/img/EficiXProc_" + codigodim + "_n" + size + ".png")
+    plt.savefig(poissonfolder + "img/EficiXProc_" + codigodim + "_n" + size + ".png")
     plt.close(fig)
 
 def main5(nvals: Iterable[int]):
@@ -280,7 +281,7 @@ def main5(nvals: Iterable[int]):
     ax.set_ylabel(r"Karp flat $\varepsilon$")
     ax.set_xlabel(r"Processadores $p$")
     # plt.show()
-    plt.savefig("Poisson/img/KarpXProc_" + codigodim + "_n" + size + ".png")
+    plt.savefig(poissonfolder + "img/KarpXProc_" + codigodim + "_n" + size + ".png")
     plt.close(fig)
 
 def main6(listfilenames: Iterable[str], pfix: Optional[int] = None):
@@ -290,9 +291,10 @@ def main6(listfilenames: Iterable[str], pfix: Optional[int] = None):
     apenas para os eventos que r > 0.02
     """
     allpoints = {}
+    eventstosave = ["DMCreateMat", "SFSetGraph", "VecMDot", "VecNorm", "VecScale", "VecCopy", "VecSet", "VecAXPY", "VecMAXPY", "VecNormalize",  "MatMult", "MatSolve", "MatLUFactorNum", "MatILUFactorSym", "MatAssemblyBegin", "MatAssemblyEnd", "MatGetRowIJ", "MatGetOrdering", "KSPSetUp", "KSPSolve", "KSPGMRESOrthog", "PCSetUp", "PCApply"]
     # eventstosave = ["VecMDot", "VecMAXPY", "MatMult", "MatSolve", "KSPSolve", "KSPGMRESOrthog", "PCApply"]
-    # eventstosave = ["VecMAXPY", "KSPSolve", "KSPGMRESOrthog", "PCApply"]
-    eventstosave = ["KSPSolve", "KSPGMRESOrthog"]
+    eventstosave = ["VecMAXPY", "KSPSolve", "KSPGMRESOrthog", "PCApply"]
+    # eventstosave = ["KSPSolve", "KSPGMRESOrthog"]
     for filename in listfilenames:
         p, n, t = get_pnt(filename)
         if t < 0:
@@ -318,20 +320,23 @@ def main6(listfilenames: Iterable[str], pfix: Optional[int] = None):
         points = np.array(points)
         nvals = points[:, 0]
         rvals = points[:, 1]
-        plt.scatter(nvals, rvals, color=colors[i], marker=".", label=ev)
         if doregressao:
             pointsregressao = regressao_spline(np.log(nvals), rvals)
             pointsregressao[:, 0] = np.exp(pointsregressao[:, 0])
-            plt.plot(pointsregressao[:, 0], pointsregressao[:, 1], color=colors[i], ls="dotted") 
+            line, = plt.plot(pointsregressao[:, 0], pointsregressao[:, 1], ls="dotted") 
+            plt.scatter(nvals, rvals, marker=".", color=line.get_color(), label=ev)
+        else:
+            plt.scatter(nvals, rvals, marker=".", color=line.get_color(), label=ev)
     plt.gca().set_xscale("log")
     plt.legend()
     plt.xlabel(r"Tamanho de malha $n$")
     if pfix is not None:
-        plt.ylabel(r"Fração $\dfrac{T_{i}(n, %d)}{T(n, %d)}$"%(pfix, pfix))
+        plt.ylabel(r"Fração $\dfrac{T_{i}}{T(n, %d)}$"%pfix)
     else:
-        plt.ylabel(r"Fração $\dfrac{T_{i}(n, p)}{T(n, p)}$")
+        plt.ylabel(r"Fração $\dfrac{T_{i}}{T(n, p)}$")
     plt.grid()
-    plt.savefig("Poisson/img/RazaoTempoXMalha_" + codigodim + ".png")
+    plt.ylim(0, 1.1)
+    plt.savefig(poissonfolder + "img/RazaoTempoXMalha_" + codigodim + "-p%s.png" % str(pfix))
     plt.close(fig)
 
 def main7(listfilenames: Iterable[str], pfix: Optional[int] = None):
@@ -377,7 +382,7 @@ def main7(listfilenames: Iterable[str], pfix: Optional[int] = None):
     plt.xlabel(r"Tamanho de malha $n$")
     plt.ylabel("Memória total consumida (GB)")
     plt.grid()
-    plt.savefig("Poisson/img/MemoriaConsumidaXMalha_" + codigodim + ".png")
+    plt.savefig(poissonfolder + "img/MemoriaConsumidaXMalha_" + codigodim + "-p%s.png" % str(pfix))
     plt.close(fig)
             
 def main8(allfilenames: Iterable[str], nvals: Iterable[int]):
@@ -428,7 +433,7 @@ def main8(allfilenames: Iterable[str], nvals: Iterable[int]):
     ax.set_xlabel(r"Processadores $p$")
     ax.set_ylabel(r"Numero de mensagens")
     # plt.show()
-    plt.savefig("Poisson/img/QuantidadeMessageXProc_" + codigodim + "_n" + size + ".png")
+    plt.savefig(poissonfolder + "img/QuantidadeMessageXProc_" + codigodim + "_n" + size + ".png")
     plt.close(fig)
 
 # Descoberta nova: para grandes valores de n, a quantidade de mensagens não muda...
@@ -470,7 +475,7 @@ def main9(listfilenames: Iterable[str]):
     plt.ylabel("Memória total consumida (GB)")
     # plt.title("Main 9")
     plt.grid()
-    plt.savefig("Poisson/img/MemoriaTotalConsumidaXMalha_" + codigodim + ".png")
+    plt.savefig(poissonfolder + "img/MemoriaTotalConsumidaXMalha_" + codigodim + ".png")
     plt.close(fig)
     
 
@@ -506,7 +511,7 @@ def main10(listfilenames: Iterable[str]):
     plt.ylabel("Razao de memória consumida paralela/serial")
     # plt.title("Main 10")
     plt.grid()
-    plt.savefig("Poisson/img/RazaoMemoriaTotalXProc_" + codigodim + ".png")
+    plt.savefig(poissonfolder + "img/RazaoMemoriaTotalXProc_" + codigodim + ".png")
     plt.close(fig)
 
 
@@ -543,30 +548,35 @@ def main11(listfilenames: Iterable[str]):
     plt.xlabel(r"Tamanho de malha $n$")
     plt.ylabel(r"Fração Tempo do KSPSolve/$T(n,p)$")
     plt.grid()
-    plt.savefig("Poisson/img/FracaoTempoKSPSolveXMalha_" + codigodim + ".png")
+    plt.savefig(poissonfolder + "img/FracaoTempoKSPSolveXMalha_" + codigodim + ".png")
     plt.close(fig)
 
+
+
 if __name__ == "__main__":
-    colors = ["tab:blue", "tab:orange", "tab:green", "tab:red", "tab:purple", "tab:brown", "tab:pink", "yellow"]
+    colors = ["tab:blue", "tab:orange", "tab:green", "tab:red", "tab:purple", "tab:brown", "tab:pink", "tab:gray", "tab:olive", "tab:cyan", "k", "b", "r", "moccasin"]
     colorsdot = ["k", "tab:blue", "tab:orange", "tab:green", "tab:red", "tab:purple", "m"]
-    currentfolder = "C:/Users/carlo/Documents/Git/GraduationProject/Poisson/"
-    allfoldernames = [currentfolder + folder for folder in all_results_folders()]
-    for codigodim in ["2D_ksp"]:
-    # for codigodim in ["2D_ksp", "3D_ksp"]:
-        allfilenames = get_listfiles_in_folders(allfoldernames)
-        allfilenames = filter_files(allfilenames, codigodim)
-        allps, allns, allts = get_pnt(allfilenames)
-        main1()
-        main6(allfilenames, pfix=4)
-        main7(allfilenames, pfix=4)
-        main9(allfilenames)
-        main10(allfilenames)
-        main11(allfilenames)
-        for size in ["small", "med", "big"]:
-            nvals = get_nvals(codigodim, size)
-            main2(nvals)
-            main3(nvals)
-            main4(nvals)
-            main5(nvals)
-            main8(allfilenames, nvals)
-    plt.show()
+    poissonfolder = __file__.replace("show_results.py", "").replace("\\", "/")
+    allfoldernames = [poissonfolder + folder for folder in all_results_folders()]
+    
+    for pfix in range(1, 9):
+        for codigodim in ["2D_ksp"]:
+        # for codigodim in ["2D_ksp", "3D_ksp"]:
+            allfilenames = get_listfiles_in_folders(allfoldernames)
+            allfilenames = filter_files(allfilenames, codigodim)
+            allps, allns, allts = get_pnt(allfilenames)
+            # main1()
+            # main6(allfilenames, pfix=pfix)
+            main7(allfilenames, pfix=pfix)
+            # main9(allfilenames)
+            # main10(allfilenames)
+            # main11(allfilenames)
+            # for size in ["small", "med", "big"]:
+            #     nvals = get_nvals(codigodim, size)
+            #     main2(nvals)
+            #     main3(nvals)
+            #     main4(nvals)
+            #     main5(nvals)
+            #     main8(allfilenames, nvals)
+    # plt.show()
+    
